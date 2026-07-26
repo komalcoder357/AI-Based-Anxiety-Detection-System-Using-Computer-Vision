@@ -1,0 +1,16 @@
+<h2>Your Anxiety Session History</h2>
+<table>
+<tr>
+<th>Start</th><th>End</th><th>Start %</th><th>End %</th><th>Average</th>
+</tr>
+
+{% for row in data %}
+<tr>
+<td>{{ row[0] }}</td>
+<td>{{ row[1] }}</td>
+<td>{{ row[2] }}%</td>
+<td>{{ row[3] }}%</td>
+<td>{{ row[4] }}%</td>
+</tr>
+{% endfor %}
+</table>

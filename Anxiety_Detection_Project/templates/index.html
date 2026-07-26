@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Muzamil | Anxiety Detection AI</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <h1>Muzamil</h1>
+    <p>Anxiety Detection AI System</p>
+    <p>Welcome, <b>{{ user }}</b></p>
+
+    <!-- LOGOUT -->
+    <a href="/logout" style="color:#38bdf8;font-size:14px;">Logout</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="camera">
+    <h1>Live Camera</h1>
+    <img src="{{ url_for('video') }}" alt="Live Camera Feed">
+  </div>
+
+  <div class="analysis">
+    <h2>Anxiety Analysis</h2>
+
+    <button id="themeBtn">🌙 Light Mode</button>
+    <button id="soundBtn">🔊 Enable Sound</button>
+    <button id="startBtn">▶ Start Analysis</button>
+
+    <div id="percent">0%</div>
+    <div id="level">LOW</div>
+
+    <div class="bar">
+      <div id="fill"></div>
+    </div>
+
+    <canvas id="chart"></canvas>
+
+    <div class="evaluation" id="evaluation">
+      Status: Waiting to start...
+
+    
+    </div>
+<br>
+       <p>
+                This web application analyzes facial expressions in real-time
+                and estimates anxiety levels using image processing techniques.
+            </p>
+             <div class="note">
+                <strong>Note:</strong><br>
+                This system is developed for academic and research purposes only.
+                It does not provide medical diagnosis.
+            </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  © 2026 Muzamil | AI Project
+</footer>
+
+<audio id="alertSound" preload="auto">
+  <source src="{{ url_for('static', filename='alert.mp3') }}" type="audio/mpeg">
+</audio>
+
+<script>
+/* ===== ELEMENTS ===== */
+const percent = document.getElementById("percent");
+const level = document.getElementById("level");
+const fill = document.getElementById("fill");
+const evaluation = document.getElementById("evaluation");
+const themeBtn = document.getElementById("themeBtn");
+const soundBtn = document.getElementById("soundBtn");
+const startBtn = document.getElementById("startBtn");
+const alertSound = document.getElementById("alertSound");
+
+/* ===== STATES ===== */
+let anxietyData = [];
+let labels = [];
+let dark = true;
+let soundPlayed = false;
+let soundEnabled = false;
+let analysisRunning = false;
+
+/* ===== CHART ===== */
+const ctx = document.getElementById("chart").getContext("2d");
+const chart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels,
+    datasets: [{
+      label: "Anxiety Level",
+      data: anxietyData,
+      borderColor: "red",
+      borderWidth: 2,
+      tension: 0.3
+    }]
+  },
+  options: {
+    responsive: true,
+    animation: false,
+    scales: { y: { min: 0, max: 100 } }
+  }
+});
+
+/* ===== THEME ===== */
+themeBtn.onclick = () => {
+  dark = !dark;
+  document.body.classList.toggle("light");
+  themeBtn.innerText = dark ? "🌙 Light Mode" : "☀ Dark Mode";
+};
+
+/* ===== SOUND ENABLE ===== */
+soundBtn.onclick = () => {
+  alertSound.play().then(() => {
+    alertSound.pause();
+    alertSound.currentTime = 0;
+    soundEnabled = true;
+    soundBtn.innerText = "🔊 Sound Enabled";
+  });
+};
+
+/* ===== START / STOP ANALYSIS ===== */
+startBtn.onclick = () => {
+  analysisRunning = !analysisRunning;
+  startBtn.innerText = analysisRunning ? "⏸ Stop Analysis" : "▶ Start Analysis";
+  evaluation.innerText = analysisRunning
+    ? "Status: Analyzing..."
+    : "Status: Stopped";
+};
+
+/* ===== DATA LOOP ===== */
+function updateData() {
+  if (!analysisRunning) return;
+
+  fetch("/data")
+    .then(res => res.json())
+    .then(data => {
+      const anxiety = Number(data.anxiety);
+
+      percent.innerText = anxiety + "%";
+      level.innerText = data.level;
+
+      fill.style.width = anxiety + "%";
+      fill.style.background =
+        anxiety < 40 ? "green" :
+        anxiety < 70 ? "orange" : "red";
+
+      anxietyData.push(anxiety);
+      labels.push("");
+
+      if (anxietyData.length > 20) {
+        anxietyData.shift();
+        labels.shift();
+      }
+
+      chart.update();
+
+      if (anxiety < 35) {
+        evaluation.innerText = "✔ You appear calm and relaxed.";
+        evaluation.style.borderLeft = "6px solid green";
+      } else if (anxiety < 70) {
+        evaluation.innerText = "⚠ Mild anxiety detected.";
+        evaluation.style.borderLeft = "6px solid orange";
+      } else {
+        evaluation.innerText = "❌ High anxiety detected!";
+        evaluation.style.borderLeft = "6px solid red";
+      }
+
+      if (anxiety > 70 && soundEnabled && !soundPlayed) {
+        alertSound.play();
+        soundPlayed = true;
+      }
+      if (anxiety < 60) soundPlayed = false;
+    });
+}
+
+setInterval(updateData, 1000);
+</script>
+
+</body>
+</html>

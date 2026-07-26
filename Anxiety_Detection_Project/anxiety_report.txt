@@ -1,0 +1,5 @@
+Anxiety Detection Report
+------------------------
+Start Anxiety: 29%
+End Anxiety: 40%
+Average Anxiety: 25%

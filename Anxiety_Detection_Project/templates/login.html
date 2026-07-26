@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Muzamil | Login</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <h1>Muzamil</h1>
+    <p>Anxiety Detection AI System</p>
+  </div>
+</header>
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <h2>Welcome Back</h2>
+    <p class="login-sub">Enter your name to start anxiety analysis</p>
+
+    <form method="POST" action="/login">
+      <input type="text" name="username" placeholder="Enter your name" required>
+      <button type="submit">Start Analysis</button>
+    </form>
+  </div>
+</div>
+
+<footer class="footer">
+  © 2026 Muzamil | AI Project
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+ANXIETY DETECTION REPORT
+-------------------------
+Date & Time : 2026-01-17_21-52-10
+Anxiety     : 71%
+Level       : HIGH
+Confidence  : 95%
